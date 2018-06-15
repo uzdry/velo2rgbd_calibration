@@ -40,7 +40,7 @@
       angle_threshold: 0.55
       circle_radius: 0.12
       passthrough_radius_min: 1.5
-      passthrough_radius_max: 5.5
+      passthrough_radius_max: 6.0
     </rosparam>
   </node>
 

@@ -421,7 +421,7 @@ void callback(const PointCloud2::ConstPtr& laser_cloud){
     to_send.cloud = ros2_pointcloud;
 
     centers_pub.publish(to_send);
-    //if(DEBUG) ROS_INFO("Pattern centers published");
+    ROS_INFO("Pattern centers published");
   }
 }
 

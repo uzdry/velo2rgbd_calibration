@@ -93,7 +93,7 @@ add_executable(pcl_coloring src/pcl_coloring.cpp)
 add_executable(pcl_projection src/pcl_projection.cpp)
 add_executable(levinson src/levinson.cpp)
 add_executable(v2c_plane_segmentation src/plane.cpp)
-add_executable(v2c_disp_masker src/disp_masker.cpp)
+add_executable(v2c_disp_masker src/depth_masker.cpp)
 
 target_compile_options(pcl_projection PRIVATE ${OpenMP_FLAGS})
 
