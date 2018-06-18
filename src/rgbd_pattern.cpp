@@ -1,25 +1,25 @@
 /*
-  velo2cam_calibration - Automatic calibration algorithm for extrinsic parameters of a stereo camera and a velodyne
+  velo2rgbd_calibration - Automatic calibration algorithm for extrinsic parameters of a rgbd camera and a velodyne
   Copyright (C) 2017-2018 Jorge Beltran, Carlos Guindel
 
-  This file is part of velo2cam_calibration.
+  This file is part of velo2rgbd_calibration.
 
-  velo2cam_calibration is free software: you can redistribute it and/or modify
+  velo2rgbd_calibration is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 2 of the License, or
   (at your option) any later version.
 
-  velo2cam_calibration is distributed in the hope that it will be useful,
+  velo2rgbd_calibration is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with velo2cam_calibration.  If not, see <http://www.gnu.org/licenses/>.
+  along with velo2rgbd_calibration.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /*
-  stereo_pattern: Find the circle centers in the stereo cloud
+  rgbd_pattern: Find the circle centers in the rgbd cloud
 */
 
 #include <ros/ros.h>
@@ -40,9 +40,9 @@
 #include <pcl/filters/extract_indices.h>
 #include <dynamic_reconfigure/server.h>
 
-#include <velo2cam_calibration/CameraConfig.h>
-#include "velo2cam_utils.h"
-#include <velo2cam_calibration/ClusterCentroids.h>
+#include <velo2rgbd_calibration/CameraConfig.h>
+#include "velo2rgbd_utils.h"
+#include <velo2rgbd_calibration/ClusterCentroids.h>
 
 using namespace std;
 using namespace sensor_msgs;
@@ -394,7 +394,7 @@ void callback(const PointCloud2::ConstPtr& camera_cloud,
     pcl::toROSMsg(*final_cloud, final_ros);
     final_ros.header = camera_cloud->header;
 
-    velo2cam_calibration::ClusterCentroids to_send;
+    velo2rgbd_calibration::ClusterCentroids to_send;
     to_send.header = camera_cloud->header;
     to_send.total_iterations = images_proc_;
     to_send.cluster_iterations = images_used_;
@@ -404,7 +404,7 @@ void callback(const PointCloud2::ConstPtr& camera_cloud,
   }
 }
 
-void param_callback(velo2cam_calibration::CameraConfig &config, uint32_t level){
+void param_callback(velo2rgbd_calibration::CameraConfig &config, uint32_t level){
   circle_threshold_ = config.circle_threshold;
   ROS_INFO("New circle threshold: %f", circle_threshold_);
   line_threshold_ = config.line_threshold;
@@ -412,7 +412,7 @@ void param_callback(velo2cam_calibration::CameraConfig &config, uint32_t level){
 }
 
 int main(int argc, char **argv){
-  ros::init(argc, argv, "stereo_pattern");
+  ros::init(argc, argv, "rgbd_pattern");
   ros::NodeHandle nh_("~");
 
   message_filters::Subscriber<PointCloud2> camera_cloud_sub_;
@@ -428,7 +428,7 @@ int main(int argc, char **argv){
   xy_pattern_pub = nh_.advertise<PointCloud2> ("xy_pattern", 1);
   no_circles_pub = nh_.advertise<PointCloud2> ("no_circles", 1);
   cumulative_pub = nh_.advertise<PointCloud2> ("cumulative_cloud", 1);
-  final_pub = nh_.advertise<velo2cam_calibration::ClusterCentroids> ("centers_cloud", 1);
+  final_pub = nh_.advertise<velo2rgbd_calibration::ClusterCentroids> ("centers_cloud", 1);
   transf_pub = nh_.advertise<PointCloud2> ("transf_cam", 1);
   auxpoint_pub= nh_.advertise<PointCloud2> ("aux_point", 1);
 
@@ -448,8 +448,8 @@ int main(int argc, char **argv){
   nh_.param("cluster_size", cluster_size_, 0.02);
   nh_.param("min_centers_found", min_centers_found_, 4);
 
-  dynamic_reconfigure::Server<velo2cam_calibration::CameraConfig> server;
-  dynamic_reconfigure::Server<velo2cam_calibration::CameraConfig>::CallbackType f;
+  dynamic_reconfigure::Server<velo2rgbd_calibration::CameraConfig> server;
+  dynamic_reconfigure::Server<velo2rgbd_calibration::CameraConfig>::CallbackType f;
   f = boost::bind(param_callback, _1, _2);
   server.setCallback(f);
 

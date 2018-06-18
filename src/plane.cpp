@@ -1,21 +1,21 @@
 /*
-  velo2cam_calibration - Automatic calibration algorithm for extrinsic parameters of a stereo camera and a velodyne
+  velo2rgbd_calibration - Automatic calibration algorithm for extrinsic parameters of a rgbd camera and a velodyne
   Copyright (C) 2017-2018 Jorge Beltran, Carlos Guindel
 
-  This file is part of velo2cam_calibration.
+  This file is part of velo2rgbd_calibration.
 
-  velo2cam_calibration is free software: you can redistribute it and/or modify
+  velo2rgbd_calibration is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 2 of the License, or
   (at your option) any later version.
 
-  velo2cam_calibration is distributed in the hope that it will be useful,
+  velo2rgbd_calibration is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with velo2cam_calibration.  If not, see <http://www.gnu.org/licenses/>.
+  along with velo2rgbd_calibration.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /*
@@ -35,7 +35,7 @@
 #include <pcl_msgs/PointIndices.h>
 #include <pcl_msgs/ModelCoefficients.h>
 #include <dynamic_reconfigure/server.h>
-#include <velo2cam_calibration/PlaneConfig.h>
+#include <velo2rgbd_calibration/PlaneConfig.h>
 
 class SACSegmentator
 {
@@ -51,8 +51,8 @@ public:
 
   Eigen::Vector3f Axis;
 
-  dynamic_reconfigure::Server<velo2cam_calibration::PlaneConfig> server;
-  dynamic_reconfigure::Server<velo2cam_calibration::PlaneConfig>::CallbackType f;
+  dynamic_reconfigure::Server<velo2rgbd_calibration::PlaneConfig> server;
+  dynamic_reconfigure::Server<velo2rgbd_calibration::PlaneConfig>::CallbackType f;
 
   SACSegmentator():
   nh_("~"), threshold_(0.1)
@@ -138,7 +138,7 @@ public:
     coeff_pub.publish(m_coeff);
   }
 
-  void param_callback(velo2cam_calibration::PlaneConfig &config, uint32_t level){
+  void param_callback(velo2rgbd_calibration::PlaneConfig &config, uint32_t level){
     threshold_ = config.threshold;
     ROS_INFO("New distance threshold: %f", threshold_);
   }

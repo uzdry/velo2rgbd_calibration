@@ -1,21 +1,21 @@
 /*
-  velo2cam_calibration - Automatic calibration algorithm for extrinsic parameters of a stereo camera and a velodyne
+  velo2rgbd_calibration - Automatic calibration algorithm for extrinsic parameters of a rgbd camera and a velodyne
   Copyright (C) 2017-2018 Jorge Beltran, Carlos Guindel
 
-  This file is part of velo2cam_calibration.
+  This file is part of velo2rgbd_calibration.
 
-  velo2cam_calibration is free software: you can redistribute it and/or modify
+  velo2rgbd_calibration is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 2 of the License, or
   (at your option) any later version.
 
-  velo2cam_calibration is distributed in the hope that it will be useful,
+  velo2rgbd_calibration is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with velo2cam_calibration.  If not, see <http://www.gnu.org/licenses/>.
+  along with velo2rgbd_calibration.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /*
@@ -54,9 +54,9 @@
 #include <pcl/io/pcd_io.h>
 #include <dynamic_reconfigure/server.h>
 
-#include <velo2cam_calibration/LaserConfig.h>
-#include "velo2cam_utils.h"
-#include <velo2cam_calibration/ClusterCentroids.h>
+#include <velo2rgbd_calibration/LaserConfig.h>
+#include "velo2rgbd_utils.h"
+#include <velo2rgbd_calibration/ClusterCentroids.h>
 
 using namespace std;
 using namespace sensor_msgs;
@@ -414,7 +414,7 @@ void callback(const PointCloud2::ConstPtr& laser_cloud){
     pcl::toROSMsg(*centers_cloud, ros2_pointcloud);
     ros2_pointcloud.header = laser_cloud->header;
 
-    velo2cam_calibration::ClusterCentroids to_send;
+    velo2rgbd_calibration::ClusterCentroids to_send;
     to_send.header = laser_cloud->header;
     to_send.cluster_iterations = clouds_used_;
     to_send.total_iterations = clouds_proc_;
@@ -425,7 +425,7 @@ void callback(const PointCloud2::ConstPtr& laser_cloud){
   }
 }
 
-void param_callback(velo2cam_calibration::LaserConfig &config, uint32_t level){
+void param_callback(velo2rgbd_calibration::LaserConfig &config, uint32_t level){
   passthrough_radius_min_ = config.passthrough_radius_min;
   ROS_INFO("New passthrough_radius_min_ threshold: %f", passthrough_radius_min_);
   passthrough_radius_max_ = config.passthrough_radius_max;
@@ -453,7 +453,7 @@ int main(int argc, char **argv){
   pattern_pub = nh_.advertise<PointCloud2> ("pattern_circles", 1);
   auxpoint_pub = nh_.advertise<PointCloud2> ("rotated_pattern", 1);
   cumulative_pub = nh_.advertise<PointCloud2> ("cumulative_cloud", 1);
-  centers_pub = nh_.advertise<velo2cam_calibration::ClusterCentroids> ("centers_cloud", 1);
+  centers_pub = nh_.advertise<velo2rgbd_calibration::ClusterCentroids> ("centers_cloud", 1);
 
   debug_pub = nh_.advertise<PointCloud2> ("debug", 1);
 
@@ -465,8 +465,8 @@ int main(int argc, char **argv){
   nFrames = 0;
   cumulative_cloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
 
-  dynamic_reconfigure::Server<velo2cam_calibration::LaserConfig> server;
-  dynamic_reconfigure::Server<velo2cam_calibration::LaserConfig>::CallbackType f;
+  dynamic_reconfigure::Server<velo2rgbd_calibration::LaserConfig> server;
+  dynamic_reconfigure::Server<velo2rgbd_calibration::LaserConfig>::CallbackType f;
   f = boost::bind(param_callback, _1, _2);
   server.setCallback(f);
 

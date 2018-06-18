@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(velo2cam_calibration)
+project(velo2rgbd_calibration)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -w ")
 
@@ -87,8 +87,8 @@ add_definitions(
 
 ## Declare cpp executables
 add_executable(laser_pattern src/laser_pattern.cpp)
-add_executable(stereo_pattern src/stereo_pattern.cpp)
-add_executable(velo2cam_calibration src/velo2cam_calibration.cpp)
+add_executable(rgbd_pattern src/rgbd_pattern.cpp)
+add_executable(velo2rgbd_calibration src/velo2rgbd_calibration.cpp)
 add_executable(pcl_coloring src/pcl_coloring.cpp)
 add_executable(pcl_projection src/pcl_projection.cpp)
 add_executable(levinson src/levinson.cpp)
@@ -101,25 +101,25 @@ target_compile_options(pcl_projection PRIVATE ${OpenMP_FLAGS})
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(laser_pattern
   ${catkin_EXPORTED_TARGETS}
-  velo2cam_calibration_generate_messages_cpp
+  velo2rgbd_calibration_generate_messages_cpp
   ${PROJECT_NAME}_gencfg
 )
-add_dependencies(stereo_pattern
+add_dependencies(rgbd_pattern
   ${catkin_EXPORTED_TARGETS}
-  velo2cam_calibration_generate_messages_cpp
+  velo2rgbd_calibration_generate_messages_cpp
   ${PROJECT_NAME}_gencfg
 )
 add_dependencies(
-  velo2cam_calibration
+  velo2rgbd_calibration
   ${catkin_EXPORTED_TARGETS}
-  velo2cam_calibration_generate_messages_cpp
+  velo2rgbd_calibration_generate_messages_cpp
   ${PROJECT_NAME}_gencfg
 )
 add_dependencies(levinson ${catkin_EXPORTED_TARGETS})
 add_dependencies(v2c_plane_segmentation ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(stereo_pattern
+target_link_libraries(rgbd_pattern
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${PCL_LIBRARIES}
@@ -129,7 +129,7 @@ target_link_libraries(laser_pattern
   ${OpenCV_LIBRARIES}
   ${PCL_LIBRARIES}
 )
-target_link_libraries(velo2cam_calibration
+target_link_libraries(velo2rgbd_calibration
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
   ${PCL_LIBRARIES}

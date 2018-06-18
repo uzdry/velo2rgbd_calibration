@@ -1,30 +1,30 @@
 /*
-  velo2cam_calibration - Automatic calibration algorithm for extrinsic parameters of a stereo camera and a velodyne
+  velo2rgbd_calibration - Automatic calibration algorithm for extrinsic parameters of a rgbd camera and a velodyne
   Copyright (C) 2017-2018 Jorge Beltran, Carlos Guindel
 
-  This file is part of velo2cam_calibration.
+  This file is part of velo2rgbd_calibration.
 
-  velo2cam_calibration is free software: you can redistribute it and/or modify
+  velo2rgbd_calibration is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 2 of the License, or
   (at your option) any later version.
 
-  velo2cam_calibration is distributed in the hope that it will be useful,
+  velo2rgbd_calibration is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 
   You should have received a copy of the GNU General Public License
-  along with velo2cam_calibration.  If not, see <http://www.gnu.org/licenses/>.
+  along with velo2rgbd_calibration.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /*
-  velo2cam_calibration: Perform the registration step
+  velo2rgbd_calibration: Perform the registration step
 */
 
 #define PCL_NO_PRECOMPILE
 
-#include "velo2cam_calibration/ClusterCentroids.h"
+#include "velo2rgbd_calibration/ClusterCentroids.h"
 
 #include <vector>
 #include <ros/ros.h>
@@ -54,7 +54,7 @@
 #endif
 
 
-#include "velo2cam_utils.h"
+#include "velo2rgbd_utils.h"
 
 using namespace std;
 using namespace sensor_msgs;
@@ -143,7 +143,7 @@ void calibrateExtrinsics(int seek_iter = -1){
 
   sensor_msgs::PointCloud2 ros_cloud;
   pcl::toROSMsg(*local_camera_cloud, ros_cloud);
-  ros_cloud.header.frame_id = "stereo";
+  ros_cloud.header.frame_id = "rgbd";
   clusters_c.publish(ros_cloud);
 
   pcl::toROSMsg(*local_laser_cloud, ros_cloud);
@@ -246,7 +246,7 @@ void calibrateExtrinsics(int seek_iter = -1){
 
   transformStamped.header.stamp = ros::Time::now();
   transformStamped.header.frame_id = "velodyne";
-  transformStamped.child_frame_id = "stereo";
+  transformStamped.child_frame_id = "rgbd";
   transformStamped.transform.translation.x = final_trans(0,3);
   transformStamped.transform.translation.y = final_trans(1,3);
   transformStamped.transform.translation.z = final_trans(2,3);
@@ -268,7 +268,7 @@ void calibrateExtrinsics(int seek_iter = -1){
   #endif
 
   static tf::TransformBroadcaster br;
-  tf_velodyne_camera = tf::StampedTransform(transf, ros::Time::now(), "velodyne", "stereo");
+  tf_velodyne_camera = tf::StampedTransform(transf, ros::Time::now(), "velodyne", "rgbd");
   if (publish_tf_) br.sendTransform(tf_velodyne_camera);
 
   tf::Transform inverse = tf_velodyne_camera.inverse();
@@ -292,7 +292,7 @@ void calibrateExtrinsics(int seek_iter = -1){
   cameraReceived = false;
 }
 
-void laser_callback(const velo2cam_calibration::ClusterCentroids::ConstPtr velo_centroids){
+void laser_callback(const velo2rgbd_calibration::ClusterCentroids::ConstPtr velo_centroids){
   // ROS_INFO("Velodyne pattern ready!");
   laserReceived = true;
 
@@ -333,7 +333,7 @@ void laser_callback(const velo2cam_calibration::ClusterCentroids::ConstPtr velo_
   }
 }
 
-void stereo_callback(velo2cam_calibration::ClusterCentroids::ConstPtr image_centroids){
+void stereo_callback(velo2rgbd_calibration::ClusterCentroids::ConstPtr image_centroids){
   // if(DEBUG) ROS_INFO("Camera pattern ready!");
 
 #ifdef TF2
@@ -346,7 +346,7 @@ void stereo_callback(velo2cam_calibration::ClusterCentroids::ConstPtr image_cent
   tf2_ros::TransformListener tfListener(tfBuffer);
   geometry_msgs::TransformStamped transformStamped;
   try{
-    transformStamped = tfBuffer.lookupTransform("stereo", "camera_color_optical_frame",
+    transformStamped = tfBuffer.lookupTransform("rgbd", "camera_color_optical_frame",
                              ros::Time(0), ros::Duration(20));
   }
   catch (tf2::TransformException &ex) {
@@ -366,8 +366,8 @@ void stereo_callback(velo2cam_calibration::ClusterCentroids::ConstPtr image_cent
   tf::TransformListener listener;
   tf::StampedTransform transform;
   try{
-    listener.waitForTransform("stereo", "camera_color_optical_frame", ros::Time(0), ros::Duration(20.0));
-    listener.lookupTransform ("stereo", "camera_color_optical_frame", ros::Time(0), transform);
+    listener.waitForTransform("rgbd", "camera_color_optical_frame", ros::Time(0), ros::Duration(20.0));
+    listener.lookupTransform ("rgbd", "camera_color_optical_frame", ros::Time(0), transform);
   }catch (tf::TransformException& ex) {
     ROS_WARN("TF exception:\n%s", ex.what());
     return;
@@ -420,7 +420,7 @@ void stereo_callback(velo2cam_calibration::ClusterCentroids::ConstPtr image_cent
 }
 
 int main(int argc, char **argv){
-  ros::init(argc, argv, "velo2cam_calibration");
+  ros::init(argc, argv, "velo2rgbd_calibration");
   ros::NodeHandle nh_("~"); // LOCAL
 
   nh_.param<bool>("sync_iterations", sync_iterations, false);
@@ -428,7 +428,7 @@ int main(int argc, char **argv){
   nh_.param<bool>("publish_tf", publish_tf_, true);
 
   static tf::TransformBroadcaster br;
-  tf_velodyne_camera = tf::StampedTransform(tf::Transform::getIdentity(), ros::Time::now(), "velodyne", "stereo");
+  tf_velodyne_camera = tf::StampedTransform(tf::Transform::getIdentity(), ros::Time::now(), "velodyne", "rgbd");
   if (publish_tf_) br.sendTransform(tf_velodyne_camera);
 
   laserReceived = false;
@@ -438,8 +438,8 @@ int main(int argc, char **argv){
   camera_cloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
   icamera_cloud = pcl::PointCloud<pcl::PointXYZI>::Ptr(new pcl::PointCloud<pcl::PointXYZI>);
 
-  ros::Subscriber laser_sub = nh_.subscribe<velo2cam_calibration::ClusterCentroids>("cloud1", 1, laser_callback);
-  ros::Subscriber stereo_sub = nh_.subscribe<velo2cam_calibration::ClusterCentroids>("cloud2", 1, stereo_callback);
+  ros::Subscriber laser_sub = nh_.subscribe<velo2rgbd_calibration::ClusterCentroids>("cloud1", 1, laser_callback);
+  ros::Subscriber stereo_sub = nh_.subscribe<velo2rgbd_calibration::ClusterCentroids>("cloud2", 1, stereo_callback);
 
   t_pub = nh_.advertise<sensor_msgs::PointCloud2>("translated_cloud", 1);
   clusters_c = nh_.advertise<sensor_msgs::PointCloud2>("clusters_camera", 1);
@@ -485,7 +485,7 @@ int main(int argc, char **argv){
   ROS_INFO("x=%.4f y=%.4f z=%.4f",xt,yt,zt);
   ROS_INFO("roll=%.4f, pitch=%.4f, yaw=%.4f", roll, pitch, yaw);
 
-  std::string path = ros::package::getPath("velo2cam_calibration");
+  std::string path = ros::package::getPath("velo2rgbd_calibration");
   string backuppath = path + "/launch/calibrated_tf_"+ str +".launch";
   path = path + "/launch/calibrated_tf.launch";
 
@@ -502,7 +502,7 @@ int main(int argc, char **argv){
   arg->SetAttribute("default","screen");
   root->LinkEndChild( arg );
 
-  string depth2camera = "0 0 0 0 0 0 stereo camera_link";
+  string depth2camera = "0 0 0 0 0 0 rgbd camera_link";
 
   TiXmlElement * depth2camera_node = new TiXmlElement( "node" );
   depth2camera_node->SetAttribute("pkg","tf2_ros");
@@ -511,7 +511,7 @@ int main(int argc, char **argv){
   depth2camera_node->SetAttribute("args", depth2camera);
   root->LinkEndChild( depth2camera_node );
 
-  string depth2optical = "0 0 0 -1.57079632679 0 -1.57079632679 stereo camera_color_optical_frame";
+  string depth2optical = "0 0 0 -1.57079632679 0 -1.57079632679 rgbd camera_color_optical_frame";
 
   TiXmlElement * depth2optical_node = new TiXmlElement( "node" );
   depth2optical_node->SetAttribute("pkg","tf2_ros");
@@ -521,7 +521,7 @@ int main(int argc, char **argv){
   root->LinkEndChild( depth2optical_node );
 
   std::ostringstream sstream;
-  sstream << xt << " " << yt << " " << zt << " " << yaw << " " <<pitch<< " " << roll << " stereo velodyne";
+  sstream << xt << " " << yt << " " << zt << " " << yaw << " " <<pitch<< " " << roll << " rgbd velodyne";
   string tf_args = sstream.str();
   cout << tf_args << endl;
 

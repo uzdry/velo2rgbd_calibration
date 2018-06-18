@@ -1,5 +1,5 @@
 <launch>
-  <include file="$(find velo2cam_calibration)/launch/real_stereo_pattern.launch" />
-  <include file="$(find velo2cam_calibration)/launch/real_laser_pattern.launch" />
-  <include file="$(find velo2cam_calibration)/launch/velo2cam_calibration.launch" />
+  <include file="$(find velo2rgbd_calibration)/launch/rgbd_pattern.launch" />
+  <include file="$(find velo2rgbd_calibration)/launch/laser_pattern.launch" />
+  <include file="$(find velo2rgbd_calibration)/launch/velo2rgbd_calibration.launch" />
 </launch>

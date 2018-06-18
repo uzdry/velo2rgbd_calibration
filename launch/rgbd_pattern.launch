@@ -29,7 +29,7 @@
   </node>
 
   <!-- Masked depth - only edges -->
-  <node name="v2c_disp_masker" pkg="velo2cam_calibration" type="v2c_disp_masker" output="$(arg stdout)" >
+  <node name="v2c_disp_masker" pkg="velo2rgbd_calibration" type="v2c_disp_masker" output="$(arg stdout)" >
     <remap from="~image" to="camera/aligned_depth_to_color/image_raw" />
     <remap from="~mask" to="edge_detection/image" />
     <remap from="~output" to="/camera/aligned_depth_to_color/edges_image_raw" />
@@ -79,7 +79,7 @@
   </node>
 
   <!-- Plane finding on the masked cloud -->
-  <node pkg="velo2cam_calibration" type="v2c_plane_segmentation" name="planar_segmentation" output="$(arg stdout)" required="true">
+  <node pkg="velo2rgbd_calibration" type="v2c_plane_segmentation" name="planar_segmentation" output="$(arg stdout)" required="true">
     <remap from="~input"   to="full_z_filtered_points2" />
     <rosparam>
       segmentation_type: 1
@@ -99,7 +99,7 @@
   </node>
 
   <!-- Our node -->
-  <node pkg="velo2cam_calibration" type="stereo_pattern" name="stereo_pattern" output="screen">
+  <node pkg="velo2rgbd_calibration" type="rgbd_pattern" name="rgbd_pattern" output="screen">
     <remap from="~cloud2" to="masked_z_filtered_points2"/>
     <remap from="~cam_plane_coeffs" to="/planar_segmentation/model"/>
     <param name="~min_plane_normal_z" value="0.8"/>
@@ -112,13 +112,13 @@
 
   <!-- Extract circles cloud -->
   <node pkg="nodelet" type="nodelet" name="extract_circle_indices" args="load pcl/ExtractIndices stereo_pcl_manager" output="screen">
-    <remap from="~input"   to="velo2cam_calibration/z_filtered_cloud" />-
-    <remap from="~indices" to="velo2cam_calibration/inliers" />
+    <remap from="~input"   to="velo2rgbd_calibration/z_filtered_cloud" />-
+    <remap from="~indices" to="velo2rgbd_calibration/inliers" />
     <rosparam>
       negative: false
     </rosparam>
   </node>
 
-  <node pkg="tf2_ros" type="static_transform_publisher" name="depth2camera_tf" args="0 0 0 0 0 0 stereo camera_link" />
-  <node pkg="tf2_ros" type="static_transform_publisher" name="depth2optical_tf" args="0 0 0 -1.57079632679 0 -1.57079632679 stereo camera_color_optical_frame" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="depth2camera_tf" args="0 0 0 0 0 0 rgbd camera_link" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="depth2optical_tf" args="0 0 0 -1.57079632679 0 -1.57079632679 rgbd camera_color_optical_frame" />
 </launch>

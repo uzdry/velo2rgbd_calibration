@@ -2,10 +2,10 @@
 
   <arg name="stdout" default="screen" />
 
-  <node pkg="velo2cam_calibration" type="levinson" name="levinson" output="screen">
+  <node pkg="velo2rgbd_calibration" type="levinson" name="levinson" output="screen">
     <param name="~listen_to_tf" value="false" />
-    <remap from="~image" to="/stereo_camera/left/image_rect_color"/>
-    <remap from="~camera_info" to="/stereo_camera/left/camera_info"/>
+    <remap from="~camera_info" to="/camera/color/camera_info"/>
+    <remap from="~image" to="/camera/color/image_rect_color"/>
     <remap from="~cloud" to="/velodyne_points"/>
   </node>
 
