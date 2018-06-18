@@ -119,6 +119,6 @@
     </rosparam>
   </node>
 
-  <node pkg="tf" type="static_transform_publisher" name="stereo_ros_tf" args="0 0 0 -1.57079632679 0 -1.57079632679 stereo camera_link 100"/>
-
+  <node pkg="tf2_ros" type="static_transform_publisher" name="depth2camera_tf" args="0 0 0 0 0 0 stereo camera_link" />
+  <node pkg="tf2_ros" type="static_transform_publisher" name="depth2optical_tf" args="0 0 0 -1.57079632679 0 -1.57079632679 stereo camera_color_optical_frame" />
 </launch>

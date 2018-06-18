@@ -346,7 +346,7 @@ void stereo_callback(velo2cam_calibration::ClusterCentroids::ConstPtr image_cent
   tf2_ros::TransformListener tfListener(tfBuffer);
   geometry_msgs::TransformStamped transformStamped;
   try{
-    transformStamped = tfBuffer.lookupTransform("stereo", "camera_link",
+    transformStamped = tfBuffer.lookupTransform("stereo", "camera_color_optical_frame",
                              ros::Time(0), ros::Duration(20));
   }
   catch (tf2::TransformException &ex) {
@@ -366,8 +366,8 @@ void stereo_callback(velo2cam_calibration::ClusterCentroids::ConstPtr image_cent
   tf::TransformListener listener;
   tf::StampedTransform transform;
   try{
-    listener.waitForTransform("stereo", "camera_link", ros::Time(0), ros::Duration(20.0));
-    listener.lookupTransform ("stereo", "camera_link", ros::Time(0), transform);
+    listener.waitForTransform("stereo", "camera_color_optical_frame", ros::Time(0), ros::Duration(20.0));
+    listener.lookupTransform ("stereo", "camera_color_optical_frame", ros::Time(0), transform);
   }catch (tf::TransformException& ex) {
     ROS_WARN("TF exception:\n%s", ex.what());
     return;
@@ -502,26 +502,35 @@ int main(int argc, char **argv){
   arg->SetAttribute("default","screen");
   root->LinkEndChild( arg );
 
-  string stereo_rotation = "0 0 0 -1.57079632679 0 -1.57079632679 stereo camera_link 10";
+  string depth2camera = "0 0 0 0 0 0 stereo camera_link";
 
-  TiXmlElement * stereo_rotation_node = new TiXmlElement( "node" );
-  stereo_rotation_node->SetAttribute("pkg","tf");
-  stereo_rotation_node->SetAttribute("type","static_transform_publisher");
-  stereo_rotation_node->SetAttribute("name","stereo_ros_tf");
-  stereo_rotation_node->SetAttribute("args", stereo_rotation);
-  root->LinkEndChild( stereo_rotation_node );
+  TiXmlElement * depth2camera_node = new TiXmlElement( "node" );
+  depth2camera_node->SetAttribute("pkg","tf2_ros");
+  depth2camera_node->SetAttribute("type","static_transform_publisher");
+  depth2camera_node->SetAttribute("name","depth2camera_tf");
+  depth2camera_node->SetAttribute("args", depth2camera);
+  root->LinkEndChild( depth2camera_node );
+
+  string depth2optical = "0 0 0 -1.57079632679 0 -1.57079632679 stereo camera_color_optical_frame";
+
+  TiXmlElement * depth2optical_node = new TiXmlElement( "node" );
+  depth2optical_node->SetAttribute("pkg","tf2_ros");
+  depth2optical_node->SetAttribute("type","static_transform_publisher");
+  depth2optical_node->SetAttribute("name","depth2optical_tf");
+  depth2optical_node->SetAttribute("args", depth2optical);
+  root->LinkEndChild( depth2optical_node );
 
   std::ostringstream sstream;
-  sstream << xt << " " << yt << " " << zt << " " << yaw << " " <<pitch<< " " << roll << " stereo velodyne 100";
+  sstream << xt << " " << yt << " " << zt << " " << yaw << " " <<pitch<< " " << roll << " stereo velodyne";
   string tf_args = sstream.str();
   cout << tf_args << endl;
 
-  TiXmlElement * node = new TiXmlElement( "node" );
-  node->SetAttribute("pkg","tf");
-  node->SetAttribute("type","static_transform_publisher");
-  node->SetAttribute("name","l2c_tf");
-  node->SetAttribute("args", tf_args);
-  root->LinkEndChild( node );
+  TiXmlElement * depth2lidar_node = new TiXmlElement( "node" );
+  depth2lidar_node->SetAttribute("pkg","tf2_ros");
+  depth2lidar_node->SetAttribute("type","static_transform_publisher");
+  depth2lidar_node->SetAttribute("name","depth2lidar_tf");
+  depth2lidar_node->SetAttribute("args", tf_args);
+  root->LinkEndChild( depth2lidar_node );
 
   // Save XML file and copy
   doc.SaveFile(path);
