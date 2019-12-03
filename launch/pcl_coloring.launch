@@ -3,7 +3,7 @@
   <node pkg="velo2rgbd_calibration" type="pcl_coloring" name="pcl_coloring" output="screen">
     <remap from="~pointcloud" to="/velodyne_points"/>
     <remap from="~camera_info" to="/camera/color/camera_info"/>
-    <remap from="~image" to="/camera/color/image_rect_color"/>
+    <remap from="~image" to="/camera/color/image_raw"/>
   </node>
 
 </launch>

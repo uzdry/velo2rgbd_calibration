@@ -4,7 +4,7 @@
 
   <!-- Edge detection -->
   <node name="edge_detection" pkg="opencv_apps" type="edge_detection" output="$(arg stdout)" >
-    <remap from="image" to="camera/color/image_rect_colo" />
+    <remap from="image" to="/camera/color/image_raw" />
     <param name="use_camera_info" value="false" />
     <param name="debug_view" value="false" />
     <param name="edge_type" value="0" />
@@ -21,7 +21,7 @@
   <node pkg="velo2rgbd_calibration" type="levinson" name="levinson" output="screen">
     <param name="listen_to_tf" value="false"/>
     <remap from="~camera_info" to="/camera/color/camera_info"/>
-    <remap from="~image" to="/camera/color/image_rect_color"/>
+    <remap from="~image" to="/camera/color/image_raw"/>
     <remap from="~cloud" to="/velodyne_points"/>
   </node>
 

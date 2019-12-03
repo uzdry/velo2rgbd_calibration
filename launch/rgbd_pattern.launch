@@ -6,7 +6,7 @@
   <node pkg="nodelet" type="nodelet" name="fullpoints_manager" args="manager"/>
   <node pkg="nodelet" type="nodelet" name="fullpoints_xyzrgb"
         args="load depth_image_proc/point_cloud_xyzrgb fullpoints_manager" respawn="true">
-    <remap from="rgb/image_rect_color"        to="camera/color/image_rect_color" />
+    <remap from="rgb/image_rect_color"        to="camera/color/image_raw" />
     <remap from="rgb/camera_info"             to="camera/color/camera_info" />
     <remap from="depth_registered/image_rect" to="camera/aligned_depth_to_color/image_raw" />
     <remap from="depth_registered/points"     to="full_points2" />
@@ -14,7 +14,7 @@
 
   <!-- Edge detection -->
   <node name="edge_detection" pkg="opencv_apps" type="edge_detection" output="$(arg stdout)" >
-    <remap from="image" to="camera/color/image_rect_color" />
+    <remap from="image" to="camera/color/image_raw" />
     <param name="use_camera_info" value="false" />
     <param name="debug_view" value="false" />
     <param name="edge_type" value="0" />
@@ -40,7 +40,7 @@
   <node pkg="nodelet" type="nodelet" name="maskedpoints_manager" args="manager"/>
   <node pkg="nodelet" type="nodelet" name="masekdpoints_xyzrgb"
         args="load depth_image_proc/point_cloud_xyzrgb maskedpoints_manager" respawn="true">
-    <remap from="rgb/image_rect_color"        to="camera/color/image_rect_color" />
+    <remap from="rgb/image_rect_color"        to="camera/color/image_raw" />
     <remap from="rgb/camera_info"             to="camera/color/camera_info" />
     <remap from="depth_registered/image_rect" to="/camera/aligned_depth_to_color/edges_image_raw" />
     <remap from="depth_registered/points"     to="masked_points2" />
